@@ -6,10 +6,10 @@
 //there.  Some is likely form webglfundamentals.org... but I'm no longer even
 //sure if anything I used is still in here
 
-//const DEBUG = true;
-const DEBUG = false;
 
-const CULL  = false;
+//For debugging
+const DEBUG = false;
+const CULL  = true;
 const DEPTH = true;
 
 //Standardized key codes:
@@ -73,8 +73,9 @@ function main()
     //State associated with keypresses
     var keys =
     {
-        code: 0,
-        wireframe: false
+        code:       0,
+        wireframe:  false,
+        windmill:   false
     }
     camera = get_camera(aspect, [50, 50]);
 
@@ -97,8 +98,8 @@ function main()
 
 
     var scene_graph = get_scene( init_cube(gl) );
-    var windmill    = search_graph("windmill");
-    var blades      = search_graph("blades");
+    var windmill    = search_graph( "windmill",    scene_graph );
+    var blades      = search_graph( "blades",   scene_graph );
 
     //var skybox = init_skybox(gl);
 
@@ -142,8 +143,8 @@ function main()
 
     //    gl.clearColor( 0.25, 0.5, 0.75, 1.0 );
     gl.clearColor( 0.0, 0.0, 0.0, 1.0 );
-    var obj_qty = scene_graph.length;
-    var chrono  = Date.now()
+    //var obj_qty = scene_graph.length;
+//    var chrono  = Date.now()
 
         var tick = function()
         {
@@ -152,14 +153,20 @@ function main()
             gl.clear( gl.DEPTH_BUFFER_BIT );
 
             if( keys.code != 0 );
-            key_response( camera, keys, scene_graph );
+            key_response( camera, keys, windmill );
 
-            chrono = Date.now();
+            if( blades && keys.windmill )
+                blades.rotate( 0, 0, 2 * ANGLE_INCREMENT );
+
+            /*
             for( var ii = 0; ii < obj_qty; ii++ )
                 scene_graph[ii].update_world();
 
             for( var ii = 0; ii < obj_qty; ii++ )
                 scene_graph[ii].render( gl, camera.view, camera.proj, keys.wireframe ); 
+                */
+                scene_graph.update_world();
+                scene_graph.render( gl, camera.view, camera.proj, keys.wireframe ); 
 
             //Render "Terrain" last to show depth buffer functioning.
             render_terrain( gl, terrain, camera.view, camera.proj, keys.wireframe );
@@ -167,7 +174,7 @@ function main()
             requestAnimationFrame( tick, canvas );
         };
 
-    tick();
+        tick();
 }
 
 function handle_key_down( e, keys )
@@ -258,7 +265,7 @@ function handle_key_up( e, keys )
     }
 }
 
-function key_response( camera, key, graph )
+function key_response( camera, key, windmill )
 {
     var mov_dist;
     if( key.code & SHIFT )
@@ -294,12 +301,13 @@ function key_response( camera, key, graph )
 
     if( key.code & W_KEY ) //toggle windmill on/off
     {
+        key.windmill = !key.windmill;
         key.code &= (~W_KEY); //only do this once.
     }
 
     if( key.code & Y_KEY ) //rotate windmill
-        ;
-
+        windmill.rotate( 0, ANGLE_INCREMENT, 0 );
+    
     if( key.code & TILDA_KEY )
     {
         key.wireframe = !key.wireframe;
