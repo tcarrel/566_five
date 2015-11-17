@@ -24,6 +24,7 @@ const SHFT_CODE     =  16;
 const E_CODE        =  69;
 const D_CODE        =  68;
 const SPACE_BAR     =  32;
+const HELP_CODE     = 191;
 
 //binary key codes, as used for internal state.
 const DOWN_ARROW    =    1;
@@ -32,11 +33,12 @@ const RIGHT_ARROW   =    4;
 const LEFT_ARROW    =    8;
 const W_KEY         =   16;
 const Y_KEY         =   32;
-const TILDA_KEY         =   64;
+const TILDA_KEY     =   64;
 const SHIFT         =  128;
 const E_KEY         =  256;
 const D_KEY         =  512;
 const SPACE         = 1024;
+const HELP          = 2048;
 
 //Adjust movement speeds:
 const ANGLE_INCREMENT       = 1.5;
@@ -211,6 +213,9 @@ function handle_key_down( e, keys )
         case SPACE_BAR:
             keys.code |= SPACE;
             break;
+        case HELP_CODE:
+            keys.code |= HELP;
+            break;
         default:
             return;
     }
@@ -298,5 +303,32 @@ function key_response( camera, key, graph )
     {
         key.wireframe = !key.wireframe;
         key.code &= ~TILDA_KEY;
+    }
+
+    if( key.code & HELP )
+    {
+        alert(
+                "Controls:\n" +
+                "   Movement\n" +
+                "       [up arrow]\n" +
+                "           Move forward.\n" +
+                "       [down_arrow]\n" +
+                "           Move backwards.\n" +
+                "       [e]\n" +
+                "           Look up.\n" +
+                "       [d]\n" +
+                "           Look down.\n\n" +
+                "   Windmill\n" +
+                "       [w]\n" +
+                "           Toggle windmill on/off.\n" +
+                "       [y]\n" +
+                "           Rotate windmill.\n\n" +
+                "   Debug/&c.\n" +
+                "       [~] or [`]\n" +
+                '           Toggle "wireframe" debug.\n' +
+                "       [/] or [?]\n" +
+                "           Shows these instructions.\n"
+             );
+        key.code &= ~HELP;
     }
 }

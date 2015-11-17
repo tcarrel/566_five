@@ -8,8 +8,8 @@ function get_scene(shape)
     ///////////////////
     // Make the cube.
     objects.push(world_obj( 
-                 2,  2,  2,     //Scale.
-                 0,  1/2,  0,     //Origin.
+                 1,  1,  1,     //Scale.
+                 0,  0.5,  0,     //Origin.
                 10,  0, 10,     //Initial translation.
                 12,  15,  0,   //Initial rotation about the local origin.
                 true,           //Bool, some nodes may not need to be drawn.
@@ -111,7 +111,6 @@ function world_obj(
     {
         name: id,
         scale:          new Matrix4,
-        scale_group:    new Matrix4,
         pos:            new Matrix4,
         local_origin:   new Matrix4,
         rot:            new Matrix4,        
@@ -220,8 +219,9 @@ function world_obj(
     obj.scale.setScale( xs, ys, zs );
     */
 
-    obj.local_matrix.setTranslate( xo, yo, zo );
-    obj.local_matrix.scale( xs, ys, zs );
+    obj.local_matrix.setScale( xs, ys, zs );
+    obj.local_matrix.translate( xo, yo, zo );
+
     //obj.set_rotate( xr, yr, zr );
     obj.update_world();
 
