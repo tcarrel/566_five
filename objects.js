@@ -185,9 +185,10 @@ function world_obj(
             this.scl.scale( x, y, z );
             this.set_dirty();
         },
-        update_world:   function(p_world)
+        update_world:   function(dirty, p_world)
         {
-            if( this.dirty ) // Only update if something has changed.
+            dirty |= this.dirty;
+            if( dirty ) // Only update if something has changed.
             { 
                 this.local_matrix.concat( this.pos );
                 this.local_matrix.concat( this.local_rot );
@@ -212,7 +213,7 @@ function world_obj(
 
             // Recursively update all children in graph.
             for( var ii = 0; ii < this.children.length; ii++ )
-                this.children[ii].update_world( this.world_matrix );
+                this.children[ii].update_world( dirty, this.world_matrix );
 
             this.dirty = false;
         },

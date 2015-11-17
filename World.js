@@ -150,7 +150,7 @@ function main()
 
         key_response( camera, keys );
 
-        scene_graph.update_world();
+        scene_graph.update_world( false );
         scene_graph.render( gl, camera.view, camera.proj, keys.code & WIREFRAME ); 
 
         //Render "Terrain" last to show depth buffer functioning.
