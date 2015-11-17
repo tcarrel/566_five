@@ -1,7 +1,7 @@
 
 
 const I = 1; const J = 2; const K = 4;
-const BASE_TILT = 15;
+const BASE_TILT = 10;
 
 /** Creates the camera object.
  * @param aspect, the initial aspect ratio.

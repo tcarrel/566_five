@@ -148,7 +148,7 @@ function render_terrain( gl, T, at, pers, wf )
                 T.shape.length / T.ppv );
     else
         gl.drawArrays(
-                gl.LINES,
+                gl.LINE_LOOP,
                 0,
                 T.shape.length / T.ppv );
 }

@@ -26,11 +26,12 @@ function get_scene(shape)
 
     ///////////////////
     // Make the table.
+    //   location is randomized...
     var table = world_obj(
             1,   1, 1,
             0,   1/2, 0, //Set origin to bottom of the feet of table.
-            30.3,   0, 15,
-            0,   12.25, 0,
+            Math.random() * 50,   0, Math.random() * 50,
+            0,   (Math.random() * 360), 0,
             null,
             "table" );
 
@@ -101,7 +102,12 @@ function get_scene(shape)
             );
 
     var blades_ = [];
-    var b_qty = Number(window.prompt("Number of blades?\n  Less than 30.", "5"));
+    var b_qty = Math.floor(Number(window.prompt(
+                "Number of blades?\n" +
+                "  Less than 30 is recommended.\n"+
+                "  Press [?]/[/] for command listing.", "5")));
+    if( !b_qty || b_qty == 0 )
+        b_qty = 1 + Math.floor( Math.random() * 20 );
     for( var ii = 0; ii < 360; ii += (360 / b_qty) )
         blades_.push( world_obj(
                     1/16, 5/16, 1/64,
@@ -136,8 +142,8 @@ function world_obj(
         name:           id,
         pos:            new Matrix4,
         scl:            new Matrix4,
-        rot:            new Matrix4,        
-        local_rot:      new Matrix4,
+        rot:            new Matrix4, //Rotation about the "global" basis.
+        local_rot:      new Matrix4, //Rotation about local basis.
         origin:         new Matrix4,
         world_matrix:   new Matrix4,
         local_matrix:   new Matrix4,

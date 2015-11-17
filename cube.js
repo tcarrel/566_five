@@ -56,7 +56,7 @@ function init_cube( gl )
             if( !wf )
                 gl.drawElements(gl.TRIANGLES, this.indicies.length, gl.UNSIGNED_BYTE, 0);
             else
-                gl.drawElements(gl.LINES, this.indicies.length, gl.UNSIGNED_BYTE, 0);
+                gl.drawElements(gl.LINE_LOOP, this.indicies.length, gl.UNSIGNED_BYTE, 0);
         },
         //Create buffer object
         i_buffer: gl.createBuffer(),

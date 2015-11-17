@@ -25,29 +25,40 @@ const E_CODE        =  69;
 const D_CODE        =  68;
 const SPACE_BAR     =  32;
 const HELP_CODE     = 191;
+const U_CODE        =  85;
+const H_CODE        =  72;
+const J_CODE        =  74;
+const B_CODE        =  66;
+const N_CODE        =  78;
+const G_CODE        =  71;
+const V_CODE        =  86;
 
 //binary key codes, as used for internal state.
-const DOWN_ARROW    =    1;
-const UP_ARROW      =    2;
-const RIGHT_ARROW   =    4;
-const LEFT_ARROW    =    8;
-const W_KEY         =   16;
-const Y_KEY         =   32;
-const TILDA_KEY     =   64;
-const SHIFT         =  128;
-const E_KEY         =  256;
-const D_KEY         =  512;
-const SPACE         = 1024;
-const HELP          = 2048;
+const DOWN_ARROW    = 1 //<< 0;
+const UP_ARROW      = 1 <<  1;
+const RIGHT_ARROW   = 1 <<  2;
+const LEFT_ARROW    = 1 <<  3;
+const W_KEY         = 1 <<  4;
+const Y_KEY         = 1 <<  5;
+const TILDA_KEY     = 1 <<  6;
+const SHIFT         = 1 <<  7;
+const E_KEY         = 1 <<  8;
+const D_KEY         = 1 <<  9;
+const SPACE         = 1 << 10;
+const HELP          = 1 << 11;
+const U_KEY         = 1 << 12;
+const J_KEY         = 1 << 13;
+const H_KEY         = 1 << 14;
+const B_KEY         = 1 << 15;
+const N_KEY         = 1 << 16;
+const G_KEY         = 1 << 17;
+const V_KEY         = 1 << 18;
+const WIREFRAME     = 1 << 19;
+const WINDMILL_ON      = 1 << 20;
 
 //Adjust movement speeds:
 const ANGLE_INCREMENT       = 1.5;
 const POSITION_INCREMENT    = 0.1;
-
-//Used for indexing into arrays.
-const X = 0;
-const Y = 1;
-const Z = 2;
 
 "use strict";
 
@@ -73,9 +84,7 @@ function main()
     //State associated with keypresses
     var keys =
     {
-        code:       0,
-        wireframe:  false,
-        windmill:   false
+        code: WINDMILL_ON // Begin with the windmill turning.
     }
     camera = get_camera(aspect, [50, 50]);
 
@@ -98,11 +107,10 @@ function main()
 
 
     var scene_graph = get_scene( init_cube(gl) );
-    var windmill    = search_graph( "windmill",    scene_graph );
-    var blades      = search_graph( "blades",   scene_graph );
-
-    //var skybox = init_skybox(gl);
-
+    // Get references for the key-press response.
+    keys.windmill    = search_graph( "windmill",    scene_graph );
+    keys.blades      = search_graph( "blades",      scene_graph );
+    keys.table       = search_graph( "table",       scene_graph );
 
     var t_shaders = get_terrain_shaders();
     var prog = createProgram( gl, t_shaders.vert, t_shaders.frag );
@@ -132,34 +140,21 @@ function main()
     //t_texture.src = "./resources/debug_2.png";
     //t_texture.src = "./resources/cat.jpg";
 
-    //var sky_shaders = get_sky_shaders();
-
-    //REMEMBER TO DELETE THIS LATER
-    /*
-       var trans = new Matrix4;
-       trans.setTranslate( 0, 1, 0 );
-       trans.scale( 2, 2, 2 );
-       */
-
     gl.clearColor( 0.4, 0.4, 0.5, 1.0 );
 
     var tick = function()
     {
         gl.clear( gl.COLOR_BUFFER_BIT );
-        //render_skybox(gl, sky);
+        //Render skybox here.
         gl.clear( gl.DEPTH_BUFFER_BIT );
 
-        if( keys.code != 0 );
-        key_response( camera, keys, windmill );
-
-        if( blades && keys.windmill )
-            blades.rotate( 0, 0, 2 * ANGLE_INCREMENT );
+        key_response( camera, keys );
 
         scene_graph.update_world();
-        scene_graph.render( gl, camera.view, camera.proj, keys.wireframe ); 
+        scene_graph.render( gl, camera.view, camera.proj, keys.code & WIREFRAME ); 
 
         //Render "Terrain" last to show depth buffer functioning.
-        render_terrain( gl, terrain, camera.view, camera.proj, keys.wireframe );
+        render_terrain( gl, terrain, camera.view, camera.proj, keys.code & WIREFRAME );
 
         requestAnimationFrame( tick, canvas );
     };
@@ -214,6 +209,27 @@ function handle_key_down( e, keys )
         case HELP_CODE:
             keys.code |= HELP;
             break;
+        case U_CODE:
+            keys.code |= U_KEY;
+            break;
+        case H_CODE:
+            keys.code |= H_KEY;
+            break;
+        case J_CODE:
+            keys.code |= J_KEY;
+            break;
+        case B_CODE:
+            keys.code |= B_KEY;
+            break;
+        case N_CODE:
+            keys.code |= N_KEY;
+            break;
+        case G_CODE:
+            keys.code |= G_KEY;
+            break;
+        case V_CODE:
+            keys.code |= V_KEY;
+            break;
         default:
             return;
     }
@@ -250,12 +266,33 @@ function handle_key_up( e, keys )
         case D_CODE:
             keys.code &= ~D_KEY;
             break;
+        case U_CODE:
+            keys.code &= ~U_KEY;
+            break;
+        case H_CODE:
+            keys.code &= ~H_KEY;
+            break;
+        case J_CODE:
+            keys.code &= ~J_KEY;
+            break;
+        case B_CODE:
+            keys.code &= ~B_KEY;
+            break;
+        case N_CODE:
+            keys.code &= ~N_KEY;
+            break;
+        case G_CODE:
+            keys.code &= ~G_KEY;
+            break;
+        case V_CODE:
+            keys.code &= ~V_KEY;
+            break;
         default:
             return;
     }
 }
 
-function key_response( camera, key, windmill )
+function key_response( camera, key )
 {
     var mov_dist;
     if( key.code & SHIFT )
@@ -291,45 +328,71 @@ function key_response( camera, key, windmill )
 
     if( key.code & W_KEY ) //toggle windmill on/off
     {
-        key.windmill = !key.windmill;
+        //key.windmill_on = !key.windmill_on;
+        key.code ^= WINDMILL_ON;
         key.code &= (~W_KEY); //only do this once.
     }
+    if( key.code & WINDMILL_ON )
+        key.blades.rotate( 0, 0, 2 * ANGLE_INCREMENT );
 
     if( key.code & Y_KEY ) //rotate windmill
-        windmill.rotate( 0, 360 - ANGLE_INCREMENT, 0 );
+        key.windmill.rotate( 0, 360 - (1.5 * ANGLE_INCREMENT), 0 );
+    else if( key.code & U_KEY )
+        key.windmill.rotate( 0, 1.5 * ANGLE_INCREMENT, 0 );
+
+    if( key.code & H_KEY )
+        key.table.rotate( 0, 360 - ANGLE_INCREMENT, 0 );
+    else if( key.code & J_KEY )
+        key.table.rotate( 0, ANGLE_INCREMENT, 0 );
+
+    if( key.code & B_KEY )
+        key.table.rotate( 0, 0, 360 - ANGLE_INCREMENT );
+    else if( key.code & N_KEY )
+        key.table.rotate( 0, 0, ANGLE_INCREMENT );
+
+    if( key.code & G_KEY )
+        key.table.rotate( 360 - ANGLE_INCREMENT, 0, 0 );
+    else if( key.code & V_KEY )
+        key.table.rotate( ANGLE_INCREMENT, 0, 0 );
 
     if( key.code & TILDA_KEY )
     {
-        key.wireframe = !key.wireframe;
+        //        key.wireframe = !key.wireframe;
+        key.code ^= WIREFRAME;
         key.code &= ~TILDA_KEY;
     }
 
     if( key.code & HELP )
     {
         alert(
-                "Controls:\n" +
-                "   Movement\n" +
-                "       [up arrow]\n" +
-                "           Move forward.\n" +
-                "       [down_arrow]\n" +
-                "           Move backwards.\n" +
-                "       [e]\n" +
-                "           Look up.\n" +
-                "       [d]\n" +
-                "           Look down.\n" +
+                "CONTROLS\n" +
+                "   Movement:\n" +
+                "       [arrow keys]\n" +
+                "           Look or walk around.\n" +
+                "       [e], [d]\n" +
+                "           Look up or down.\n" +
+                "       [shift]\n" +
+                "           Hold to walk slower.\n\n" +
                 "       [space bar]\n" +
                 "           Reset vertical rotation.\n\n" +
-                "   Windmill\n" +
+                "   Windmill:\n" +
                 "       [w]\n" +
                 "           Toggle windmill on/off.\n" +
-                "       [y]\n" +
+                "       [y], [u]\n" +
                 "           Rotate windmill.\n\n" +
-                "   Debug/&c.\n" +
+                "   Table:\n" +
+                "       [h], [j]\n" +
+                "           Yaw.\n" +
+                "       [b], [n]\n" +
+                "           Roll.\n" +
+                "       [g], [v]\n" +
+                "           Pitch.\n\n" +
+                "   Miscelleneous:\n" +
                 "       [~] or [`]\n" +
-                '           Toggle "wireframe" debug.\n' +
+                '           Toggle "wireframe" mode.\n' +
                 "       [/] or [?]\n" +
                 "           Shows these instructions.\n"
-                );
+             );
         key.code &= ~HELP;
     }
 }
