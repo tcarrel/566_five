@@ -141,40 +141,30 @@ function main()
        trans.scale( 2, 2, 2 );
        */
 
-    //    gl.clearColor( 0.25, 0.5, 0.75, 1.0 );
-    gl.clearColor( 0.0, 0.0, 0.0, 1.0 );
-    //var obj_qty = scene_graph.length;
-//    var chrono  = Date.now()
+    gl.clearColor( 0.4, 0.4, 0.5, 1.0 );
 
-        var tick = function()
-        {
-            gl.clear( gl.COLOR_BUFFER_BIT );
-            //render_skybox(gl, sky);
-            gl.clear( gl.DEPTH_BUFFER_BIT );
+    var tick = function()
+    {
+        gl.clear( gl.COLOR_BUFFER_BIT );
+        //render_skybox(gl, sky);
+        gl.clear( gl.DEPTH_BUFFER_BIT );
 
-            if( keys.code != 0 );
-            key_response( camera, keys, windmill );
+        if( keys.code != 0 );
+        key_response( camera, keys, windmill );
 
-            if( blades && keys.windmill )
-                blades.rotate( 0, 0, 2 * ANGLE_INCREMENT );
+        if( blades && keys.windmill )
+            blades.rotate( 0, 0, 2 * ANGLE_INCREMENT );
 
-            /*
-            for( var ii = 0; ii < obj_qty; ii++ )
-                scene_graph[ii].update_world();
+        scene_graph.update_world();
+        scene_graph.render( gl, camera.view, camera.proj, keys.wireframe ); 
 
-            for( var ii = 0; ii < obj_qty; ii++ )
-                scene_graph[ii].render( gl, camera.view, camera.proj, keys.wireframe ); 
-                */
-                scene_graph.update_world();
-                scene_graph.render( gl, camera.view, camera.proj, keys.wireframe ); 
+        //Render "Terrain" last to show depth buffer functioning.
+        render_terrain( gl, terrain, camera.view, camera.proj, keys.wireframe );
 
-            //Render "Terrain" last to show depth buffer functioning.
-            render_terrain( gl, terrain, camera.view, camera.proj, keys.wireframe );
+        requestAnimationFrame( tick, canvas );
+    };
 
-            requestAnimationFrame( tick, canvas );
-        };
-
-        tick();
+    tick();
 }
 
 function handle_key_down( e, keys )
@@ -306,8 +296,8 @@ function key_response( camera, key, windmill )
     }
 
     if( key.code & Y_KEY ) //rotate windmill
-        windmill.rotate( 0, ANGLE_INCREMENT, 0 );
-    
+        windmill.rotate( 0, 360 - ANGLE_INCREMENT, 0 );
+
     if( key.code & TILDA_KEY )
     {
         key.wireframe = !key.wireframe;
