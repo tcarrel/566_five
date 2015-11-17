@@ -6,70 +6,63 @@ function get_scene(shape)
     var objects = []; 
 
     ///////////////////
-    // Make the cube.
+    //  Make the cube.
+    //  -- Note that the base cube is 1x1x1 with its origin centered.
     objects.push(world_obj( 
-                 1,  1,  1,     //Scale.
-                 0,  0.5,  0,     //Origin.
-                10,  0, 10,     //Initial translation.
-                12,  15,  0,   //Initial rotation about the local origin.
-                true,           //Bool, some nodes may not need to be drawn.
+                 2,  2,  2,     //Scale.
+                 0,1/2, 10,   //Origin.
+                10,  0,  10,     //Initial translation.
+                 0,  0,   0,   //Initial rotation about the local origin.
                 shape,          //The actual shape data.
                 "cube" ) );     //A unique id or name for this piece of this shape.
 
-    /*
     ///////////////////
     // Make the table.
     var table = world_obj(
             1,   1, 1,
-            0, 1/2, 0, //Set origin to bottom of the feet of table.
-            12,   0, 12,
-            0,   90, 0,
-            false,
-            shape,
+            0,   0, 0, //Set origin to bottom of the feet of table.
+            0,   1/2, 0,
+            0,   0, 0,
+            null,
             "table" );
-    table.scale_group.set( table.scale );
+
     var leg1 = world_obj(
-            1/8,   1,  1/8,
-            0,     0,  0,
-            1/2,   1/2,  1/2,
-            0,     0,  0,
-            true,
+            1/8, 15/16,  1/8,
+            0,   -1/32,  0,
+            1/2, 0,  1/2,
+            0,   0,  0,
             shape,
             "leg_1"
             );
     var leg2 = world_obj(
-            1/8,   1,  1/8,
+            1/8, 15/16,  1/8,
+            0,     -1/32,  0,
+            -1/2,  0,  1/2,
             0,     0,  0,
-            -1/2,  1/2,  1/2,
-            0,     0,  0,
-            true,
             shape,
             "leg_2"
             );
     var leg3 = world_obj(
-            1/8,   1,  1/8,
-            0,     0,  0,
-            -1/2,  1/2, -1/2,
-            0,     0,  0,
-            true,
+            1/8, 15/16,  1/8,
+            0,     -1/32,  0,
+            -1/2,  0, -1/2,
+            0,     90,  0,
             shape,
             "leg_3"
             );
     var leg4 = world_obj(
-            1/8,   1,  1/8,
+            1/8, 15/16,  1/8,
+            0,     1/2,  0,
+            1/2,   -15/32, -1/2,
             0,     0,  0,
-            1/2,   1/2, -1/2,
-            0,     0,  0,
-            true,
             shape,
             "leg_4"
             );
     var top_ = world_obj(
             9/8, 1/16, 9/8,
+            0,  1/2,   0,
+            0,  1/2 - 1/16,   0,
             0,      0,   0,
-            0,  33/32,   0,
-            0,      0,   0,
-            true,
             shape,
             "top"
             );
@@ -83,17 +76,36 @@ function get_scene(shape)
     ///////////////////
     // Make the windmill.
     var windmill = world_obj(
-            1/32,  1/2, 1/32,
-            0,     1/16,    0,
-            0,    19/16,    0,
+            1/32, 1/2, 1/32,
+            0,     1/2,    0,
+            0,    1/2,    0,
             0,        0,    0,
-            true,
             shape,
-            "base"
+            "windmill"
             );
+    var blades  = world_obj(
+            1, 1, 1,
+            0, 0, 1/16,
+            0, 0, -1/16,
+            0, 0, 0,
+            null,
+            "blades"
+            );
+    blades.set_parent(windmill);
+    var blade_u = world_obj(
+            1/16, 1/4, 1/64,
+            0,    1/2, 0,
+            0, 0, 0,
+            0, 0, 0,
+            shape,
+            "blade_up"
+            );
+    blade_u.set_parent( blades );
+
+    windmill.set_parent( table );
+    //    var
     objects.push(windmill);
 
-    */
     return objects;
 }
 
@@ -103,98 +115,84 @@ function world_obj(
         xo, yo, zo, //Origin.
         xp, yp, zp, //Initial translation.
         xr, yr, zr, //Initial rotation about the local origin.
-        to_draw,    //Bool, some nodes may not need to be drawn.
         verts,      //The actual shape data.
         id )        //A unique id or name for this piece of this shape.
 {
     var obj = 
     {
         name: id,
-        scale:          new Matrix4,
-        pos:            new Matrix4,
-        local_origin:   new Matrix4,
+        //       pos:            new Matrix4,
         rot:            new Matrix4,        
         world_matrix:   new Matrix4,
         local_matrix:   new Matrix4,
         shape:          verts,
-        draw:           to_draw,
         parent_:        null,
         dirty:          true, // dirty "bit"
         children:       [],
-        set_rotate:         function(x, y, z) {
-            var tempx = new Matrix4;
-            var tempy = new Matrix4;
-            var tempz = new Matrix4;
-            
+        rotate:         function(x, y, z) {
             if( x != 0 )
             {
-                tempx.setRotate( x % 360, 1, 0, 0 );
+                this.local_matrix.rotate( x % 360, 1, 0, 0 );
                 this.dirty = true;
             }
             if( z != 0 )
             {
-                tempz.setRotate( z % 360, 0, 0, 1 );
+                this.local_matrix.rotate( z % 360, 0, 0, 1 );
                 this.dirty = true;
             }
             if( y != 0 )
             {
-                tempy.setRotate( y % 360, 0, 1, 0 );
+                this.local_matrix.rotate( y % 360, 0, 1, 0 );
                 this.dirty = true;
             }
-            this.rot.concat( tempz );
-            this.rot.concat( tempx );
-            this.rot.concat( tempy );
-            this.local_matrix.concat( this.rot );
         },
         translate:      function( x, y, z )
         {
-            //this.pos.set( this.local_origin );
-            this.pos.translate( x, y, z);
-            this.local_matrix.concat( this.pos );
-
+            this.local_matrix.translate( x, y, z );
+            this.dirty = true;
+        },
+        scale:          function( x, y, z )
+        {
+            this.local_matrix.scale( x, y, z );
             this.dirty = true;
         },
         update_world:   function(p_world)
         {
             if( this.dirty ) // Only update if something has changed.
-            {                //this.
+            {
                 if(p_world)
                 {
                     var temp = new Matrix4;
-                    temp.set( this.local_matrix );
-                    temp.concat( p_world );
+                    temp.set( p_world );
+                    temp.concat( this.local_matrix );
                     this.world_matrix.set(temp);
                 }
                 else
                     this.world_matrix.set( this.local_matrix );
+
+                this.dirty = false;
             }
 
             // Recursively update all children in graph.
             for( var ii = 0; ii < this.children.length; ii++ )
                 this.children[ii].update_world( this.world_matrix );
         },
-        set_origin: function( x, y, z )
-        {
-            this.local_matrix.setTranslate( x, y, z );
-        },
         set_parent:     function(par)
         {
             par.children.push(this);
             this.parent_ = par;
+            this.dirty = true;
 
             return true;
         },
-        render:         function( gl, xform, view, proj, wf )
+        render:         function( gl, view, proj, wf )
         {
             for( var ii = 0; ii < this.children.length; ii++ )
-                this.children[ii].render(gl, xform, view, proj, wf );
+                this.children[ii].render(gl, view, proj, wf );
 
-            var scaled = new Matrix4( this.local_matrix );
-            scaled.concat( this.world_matrix );
-            scaled.concat( this.scale );
-            if( this.draw )
+            if( this.shape )
             {
-                this.shape.render( gl, scaled, view, proj, wf );
+                this.shape.render( gl, this.world_matrix, view, proj, wf );
             }
         },
         get_object:     function( id )
@@ -212,15 +210,24 @@ function world_obj(
     };
 
     /*
-    obj.set_origin( xo, yo, zo );
+       obj.set_origin( xo, yo, zo );
+       obj.translate( xp, yp, zp );
+       obj.set_rotate( xr, yr, zr );
+
+       obj.scale.setScale( xs, ys, zs );
+       */
+
+    //  /*
+
     obj.translate( xp, yp, zp );
-    obj.set_rotate( xr, yr, zr );
-
-    obj.scale.setScale( xs, ys, zs );
-    */
-
-    obj.local_matrix.setScale( xs, ys, zs );
-    obj.local_matrix.translate( xo, yo, zo );
+    obj.rotate(    xr, yr, zr );
+    obj.scale(     xs, ys, zs );
+    obj.translate( xo, yo, zo );
+    //   */
+    /*
+       obj.local_matrix.translate( xo, yo, zo );
+       obj.local_matrix.scale( xs, ys, zs );
+       */
 
     //obj.set_rotate( xr, yr, zr );
     obj.update_world();

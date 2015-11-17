@@ -32,12 +32,12 @@ function init_terrain( gl, T, image )
     //Load Image.
     var quad = build_quad( 100, 100, 0, 0 );
     T.shape = new Float32Array([
-            quad[0][0], 0, quad[0][1], 0.0, 20.0,
-            quad[1][0], 0, quad[1][1], 20.0, 0.0,
-            quad[3][0], 0, quad[3][1], 0.0, 0.0,
-            quad[0][0], 0, quad[0][1], 0.0, 20.0,
-            quad[2][0], 0, quad[2][1], 20.0, 20.0,
-            quad[1][0], 0, quad[1][1], 20.0, 0.0
+            quad[0][0], 0, quad[0][1], 0.0, 0.0,
+            quad[1][0], 0, quad[1][1], 20.0,20.0,
+            quad[3][0], 0, quad[3][1], 0.0, 20.0,
+            quad[0][0], 0, quad[0][1], 0.0, 0.0,
+            quad[2][0], 0, quad[2][1], 20.0, 0.0,
+            quad[1][0], 0, quad[1][1], 20.0, 20.0
            ] 
             );
     T.ppv = 5; //Points Per Vertex

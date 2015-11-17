@@ -91,6 +91,7 @@ function main()
     // Handle browser window resize.
     document.onresize  = function()
     {
+        aspect = canvas.clientWidth / canvas.clientHeight;
         camera.update_projection(aspect);
     };
 
@@ -123,13 +124,12 @@ function main()
     };
     // Image from: 
     //http://www.art.eonworks.com/free/textures/floor_tiles_texture_005.png
-    //t_texture.src = "./resources/floor_tiles.png";
-
+    t_texture.src = "./resources/floor_tiles.png";
 
     // Different textures for debugging.
     //t_texture.src = "./resources/debug.png";
+    //t_texture.src = "./resources/debug_2.png";
     //t_texture.src = "./resources/cat.jpg";
-    t_texture.src = "./resources/debug_2.png";
 
     //var sky_shaders = get_sky_shaders();
 
@@ -145,27 +145,27 @@ function main()
     var obj_qty = scene_graph.length;
     var chrono  = Date.now()
 
-    var tick = function()
-    {
-        gl.clear( gl.COLOR_BUFFER_BIT );
-        //render_skybox(gl, sky);
-        gl.clear( gl.DEPTH_BUFFER_BIT );
+        var tick = function()
+        {
+            gl.clear( gl.COLOR_BUFFER_BIT );
+            //render_skybox(gl, sky);
+            gl.clear( gl.DEPTH_BUFFER_BIT );
 
-        if( keys.code != 0 );
-        key_response( camera, keys, scene_graph );
+            if( keys.code != 0 );
+            key_response( camera, keys, scene_graph );
 
-        chrono = Date.now();
-        for( var ii = 0; ii < obj_qty; ii++ )
-            scene_graph[ii].update_world();
+            chrono = Date.now();
+            for( var ii = 0; ii < obj_qty; ii++ )
+                scene_graph[ii].update_world();
 
-        for( var ii = 0; ii < obj_qty; ii++ )
-            scene_graph[ii].render( gl, new Matrix4,  camera.view, camera.proj, keys.wireframe ); 
+            for( var ii = 0; ii < obj_qty; ii++ )
+                scene_graph[ii].render( gl, camera.view, camera.proj, keys.wireframe ); 
 
-        //Render "Terrain" last to show depth buffer functioning.
-        render_terrain( gl, terrain, camera.view, camera.proj, keys.wireframe );
+            //Render "Terrain" last to show depth buffer functioning.
+            render_terrain( gl, terrain, camera.view, camera.proj, keys.wireframe );
 
-        requestAnimationFrame( tick, canvas );
-    };
+            requestAnimationFrame( tick, canvas );
+        };
 
     tick();
 }
@@ -318,7 +318,9 @@ function key_response( camera, key, graph )
                 "       [e]\n" +
                 "           Look up.\n" +
                 "       [d]\n" +
-                "           Look down.\n\n" +
+                "           Look down.\n" +
+                "       [space bar]\n" +
+                "           Reset vertical rotation.\n\n" +
                 "   Windmill\n" +
                 "       [w]\n" +
                 "           Toggle windmill on/off.\n" +
@@ -329,7 +331,7 @@ function key_response( camera, key, graph )
                 '           Toggle "wireframe" debug.\n' +
                 "       [/] or [?]\n" +
                 "           Shows these instructions.\n"
-             );
+                );
         key.code &= ~HELP;
     }
 }
