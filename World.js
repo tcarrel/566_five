@@ -34,7 +34,7 @@ const G_CODE        =  71;
 const V_CODE        =  86;
 
 //binary key codes, as used for internal state.
-const DOWN_ARROW    = 1 //<< 0;
+const DOWN_ARROW    = 1; //<< 0;
 const UP_ARROW      = 1 <<  1;
 const RIGHT_ARROW   = 1 <<  2;
 const LEFT_ARROW    = 1 <<  3;
