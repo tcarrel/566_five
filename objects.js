@@ -8,14 +8,15 @@ function get_scene(shape)
     ///////////////////
     // Make the cube.
     objects.push(world_obj( 
-                 2,  2,  2,
-                 0,  0,  0,
-                10,  1, 10,
-                45,  45,  45, 
-                true,
-                shape,
-                "cube" ) );
+                 2,  2,  2,     //Scale.
+                 0,  1/2,  0,     //Origin.
+                10,  0, 10,     //Initial translation.
+                12,  15,  0,   //Initial rotation about the local origin.
+                true,           //Bool, some nodes may not need to be drawn.
+                shape,          //The actual shape data.
+                "cube" ) );     //A unique id or name for this piece of this shape.
 
+    /*
     ///////////////////
     // Make the table.
     var table = world_obj(
@@ -92,7 +93,7 @@ function get_scene(shape)
             );
     objects.push(windmill);
 
-
+    */
     return objects;
 }
 
@@ -144,11 +145,13 @@ function world_obj(
             this.rot.concat( tempz );
             this.rot.concat( tempx );
             this.rot.concat( tempy );
+            this.local_matrix.concat( this.rot );
         },
         translate:      function( x, y, z )
         {
             //this.pos.set( this.local_origin );
             this.pos.translate( x, y, z);
+            this.local_matrix.concat( this.pos );
 
             this.dirty = true;
         },
@@ -157,26 +160,23 @@ function world_obj(
             if( this.dirty ) // Only update if something has changed.
             {                //this.
                 if(p_world)
-                    this.model_matrix.concat( p_world );
-                else
                 {
-                        this.model_matrix.set
+                    var temp = new Matrix4;
+                    temp.set( this.local_matrix );
+                    temp.concat( p_world );
+                    this.world_matrix.set(temp);
                 }
-                this.local_matrix.set( this.local_origin );
-                this.model_matrix.concat( this.pos );
-                this.model_matrix.concat( this.rot );                
-                this.dirty = false;
-                //  Scale is not updated so that it remains independant from
-                //scale of the other objects in the tree.
+                else
+                    this.world_matrix.set( this.local_matrix );
             }
 
             // Recursively update all children in graph.
             for( var ii = 0; ii < this.children.length; ii++ )
-                this.children[ii].update();
+                this.children[ii].update_world( this.world_matrix );
         },
         set_origin: function( x, y, z )
         {
-            this.local_origin.setTranslate( x, y, z );
+            this.local_matrix.setTranslate( x, y, z );
         },
         set_parent:     function(par)
         {
@@ -190,9 +190,9 @@ function world_obj(
             for( var ii = 0; ii < this.children.length; ii++ )
                 this.children[ii].render(gl, xform, view, proj, wf );
 
-            var scaled = new Matrix4( this.model_matrix );
+            var scaled = new Matrix4( this.local_matrix );
+            scaled.concat( this.world_matrix );
             scaled.concat( this.scale );
-
             if( this.draw )
             {
                 this.shape.render( gl, scaled, view, proj, wf );
@@ -212,11 +212,18 @@ function world_obj(
         }
     };
 
+    /*
     obj.set_origin( xo, yo, zo );
-    obj.set_rotate( xr, yr, zr );
     obj.translate( xp, yp, zp );
+    obj.set_rotate( xr, yr, zr );
+
     obj.scale.setScale( xs, ys, zs );
-    obj.update();
+    */
+
+    obj.local_matrix.setTranslate( xo, yo, zo );
+    obj.local_matrix.scale( xs, ys, zs );
+    //obj.set_rotate( xr, yr, zr );
+    obj.update_world();
 
     return obj;
 }
@@ -225,7 +232,7 @@ function world_obj(
 function search_graph( id, graph )
 {
     var found;
-    
+
     for( var ii = 0; (found === null ) && ii < graph.length; ii++ )
-     found = graph[ii].get_object(id);
+        found = graph[ii].get_object(id);
 }

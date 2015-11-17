@@ -1,5 +1,11 @@
 
 
+
+// There's code in here from other source, but I've lost track of which lines
+//are from where or by whom, however, it mostly just a line or two here and
+//there.  Some is likely form webglfundamentals.org... but I'm no longer even
+//sure if anything I used is still in here
+
 //const DEBUG = true;
 const DEBUG = false;
 
@@ -7,26 +13,26 @@ const CULL  = false;
 const DEPTH = true;
 
 //Standardized key codes:
-const UP        = 38;
-const DOWN      = 40;
-const LEFT      = 37;
-const RIGHT     = 39;
-const W_CODE    = 87;
-const Y_CODE    = 89;
-const Q_CODE    = 81;
-const SHFT_CODE = 16;
-const E_CODE    = 69;
-const D_CODE    = 68;
-const SPACE_BAR = 32;
+const UP            =  38;
+const DOWN          =  40;
+const LEFT          =  37;
+const RIGHT         =  39;
+const W_CODE        =  87;
+const Y_CODE        =  89;
+const TILDA_CODE    = 192;
+const SHFT_CODE     =  16;
+const E_CODE        =  69;
+const D_CODE        =  68;
+const SPACE_BAR     =  32;
 
-//binary key codes, as used internally:
+//binary key codes, as used for internal state.
 const DOWN_ARROW    =    1;
 const UP_ARROW      =    2;
 const RIGHT_ARROW   =    4;
 const LEFT_ARROW    =    8;
 const W_KEY         =   16;
 const Y_KEY         =   32;
-const Q_KEY         =   64;
+const TILDA_KEY         =   64;
 const SHIFT         =  128;
 const E_KEY         =  256;
 const D_KEY         =  512;
@@ -134,6 +140,7 @@ function main()
     //    gl.clearColor( 0.25, 0.5, 0.75, 1.0 );
     gl.clearColor( 0.0, 0.0, 0.0, 1.0 );
     var obj_qty = scene_graph.length;
+    var chrono  = Date.now()
 
     var tick = function()
     {
@@ -144,8 +151,9 @@ function main()
         if( keys.code != 0 );
         key_response( camera, keys, scene_graph );
 
+        chrono = Date.now();
         for( var ii = 0; ii < obj_qty; ii++ )
-            scene_graph[ii].update();
+            scene_graph[ii].update_world();
 
         for( var ii = 0; ii < obj_qty; ii++ )
             scene_graph[ii].render( gl, new Matrix4,  camera.view, camera.proj, keys.wireframe ); 
@@ -188,8 +196,8 @@ function handle_key_down( e, keys )
         case Y_CODE: //rotate windmill
             keys.code |= Y_KEY;
             break;
-        case Q_CODE: //toggle wireframe
-            keys.code |= Q_KEY;
+        case TILDA_CODE: //toggle wireframe
+            keys.code |= TILDA_KEY;
             break;
         case SHFT_CODE: 
             keys.code |= SHIFT;
@@ -286,9 +294,9 @@ function key_response( camera, key, graph )
     if( key.code & Y_KEY ) //rotate windmill
         ;
 
-    if( key.code & Q_KEY )
+    if( key.code & TILDA_KEY )
     {
         key.wireframe = !key.wireframe;
-        key.code &= ~Q_KEY;
+        key.code &= ~TILDA_KEY;
     }
 }
