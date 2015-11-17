@@ -123,12 +123,13 @@ function main()
     };
     // Image from: 
     //http://www.art.eonworks.com/free/textures/floor_tiles_texture_005.png
-    t_texture.src = "./resources/floor_tiles.png";
+    //t_texture.src = "./resources/floor_tiles.png";
 
 
-    // This is a different texture image that I used for debugging purposes.
+    // Different textures for debugging.
     //t_texture.src = "./resources/debug.png";
     //t_texture.src = "./resources/cat.jpg";
+    t_texture.src = "./resources/debug_2.png";
 
     //var sky_shaders = get_sky_shaders();
 
