@@ -2,10 +2,12 @@
 
 /**
  * Get location of an individual shader var.
+ * @param gl, The WebGL object.
+ * @param varname, The name of the shader variable as a string.
+ * @param prog, The shader program to use.
  */
 function set_svar( gl, varname, prog )
 {
-    //    gl.useProgram( prog );
 
     var vars = -1;
 
@@ -22,7 +24,7 @@ function set_svar( gl, varname, prog )
             vars = gl.getAttribLocation(prog, varname);
             break;
         default:
-            vars = -1;
+            throw "Shader variable must begin with 'a' or 'u'.";
     }
 
     if( vars < 0 )

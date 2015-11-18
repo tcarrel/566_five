@@ -1,5 +1,6 @@
 
-
+/** Builds and returns a single quad that can later be oriented and scaled as
+ * necessary.
 function build_quad( width, length, w_offset, l_offset )
 {
     var quad = [];
@@ -24,6 +25,8 @@ function build_quad( width, length, w_offset, l_offset )
     return quad;
 }
 
+/** Creates and single panel of the plane.
+ */
 function init_terrain( gl, T, image )
 {
 
@@ -99,7 +102,10 @@ function init_terrain( gl, T, image )
     T.is_loaded = true;
 }
 
-
+/** Render all terrain that has been loaded.
+ * @param gl, The monolithic WebGL object.
+ * @param T, a transformation matrix for the parent of this node.
+ */
 function render_terrain( gl, T, at, pers, wf )
 {
     if( !T.is_loaded )

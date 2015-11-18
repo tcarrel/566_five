@@ -1,6 +1,12 @@
 
 
-
+/** Generates and returns a single instance of an indexed cube, the coodinates
+ * are from an example from the course textbook, but scaled to generate a base
+ * cube whose dimensions measure 1x1x1 unit located with the origin at its
+ * centroid.
+ *
+ * @param The monolithic WebGL object.
+ */
 function init_cube( gl )
 {
     var shaders = get_cube_shaders();
@@ -29,6 +35,16 @@ function init_cube( gl )
              // back
              20,21,22,  20,22,23
              ]),
+        /**
+         * Renders one instance of the cube.
+         * @param gl, The monolithic WebGL object.
+         * @param xform, The transformation matrix of the instance of the cube
+         * being rendered.
+         * @param view, The view matrix.
+         * @param proj, The projection matrix.
+         * @param wf,   bool, if, or not, the cube should be rendered as a
+         * wireframe.
+         */
         render: function(gl, xform, view, proj, wf )
         {
             gl.useProgram(this.program);
@@ -125,6 +141,21 @@ function init_cube( gl )
     return cube;
 }
 
+/**
+ * Creates a new buffer for the data to be passed to the GPU and returns a
+ * handle to the buffer's location.
+ * @param gl, The monolithic WebGL object.
+ * @param data, The data to be loaded to the GPU.
+ * @param qty, The number of entries in the data array to be loaded into the
+ * GPU.
+ * @param type, The data-type of the data to be loaded to the GPU.  Must be one
+ * of the gl.* types, i.e.: gl.FLOAT
+ * @param attrib, The name of the appropriate attribute variable from the
+ * shader program.
+ * @param prog, The shader program to link to, this must be provided because
+ * of the asynchronous loading of various data.
+ * @param buffer, The buffer to send the data to.
+ */
 function create_array_buffer( gl, data, qty, type, attrib, prog, buffer )
 {
     gl.useProgram(prog);

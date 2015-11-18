@@ -1,7 +1,10 @@
+/**
+ * Thomas R. Carrel
+ * @file World.js
+ */
 
 
-
-// There's code in here from other source, but I've lost track of which lines
+// There's code in here from other sources, but I've lost track of which lines
 //are from where or by whom, however, it mostly just a line or two here and
 //there.  Some is likely form webglfundamentals.org... but I'm no longer even
 //sure if anything I used is still in here
@@ -54,7 +57,7 @@ const N_KEY         = 1 << 16;
 const G_KEY         = 1 << 17;
 const V_KEY         = 1 << 18;
 const WIREFRAME     = 1 << 19;
-const WINDMILL_ON      = 1 << 20;
+const WINDMILL_ON   = 1 << 20;
 
 //Adjust movement speeds:
 const ANGLE_INCREMENT       = 1.5;
@@ -133,12 +136,12 @@ function main()
     };
     // Image from: 
     //http://www.art.eonworks.com/free/textures/floor_tiles_texture_005.png
-    t_texture.src = "./resources/floor_tiles.png";
+    //t_texture.src = "./resources/floor_tiles.png";
 
     // Different textures for debugging.
     //t_texture.src = "./resources/debug.png";
     //t_texture.src = "./resources/debug_2.png";
-    //t_texture.src = "./resources/cat.jpg";
+    t_texture.src = "./resources/cat.jpg";
 
     gl.clearColor( 0.4, 0.4, 0.5, 1.0 );
 

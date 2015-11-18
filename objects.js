@@ -1,6 +1,9 @@
 
 
-
+/** Generates and returns the scene graph.
+ * @param shape, The shape to use as the basis for all objects in the scene.
+ * (This was an assignment requirement.)
+ */
 function get_scene(shape)
 {
     var objects = world_obj(
@@ -10,20 +13,18 @@ function get_scene(shape)
             0, 0, 0,
             null,
             "root" );
-//    var objects = []; 
 
     ///////////////////
     //  Make the cube.
     //  -- Note that the base cube is 1x1x1 with its origin centered.
     var cube = world_obj( 
-                2,  2,  2,     //Scale.
-                0,1/2, 10,   //Origin.
-                10,  0,  10,     //Initial translation.
-                0,  0,   0,   //Initial rotation about the local origin.
-                shape,          //The actual shape data.
+                 2,   2,   2, //Scale.
+                 0, 1/2,  10, //Origin.
+                10,   0,  10, //Initial translation.
+                 0,   0,   0, //Initial rotation about the local origin.
+                shape,        //The actual shape data.
                 "cube" );     //A unique id or name for this piece of this shape.
     
-
     ///////////////////
     // Make the table.
     //   location is randomized...
@@ -129,6 +130,8 @@ function get_scene(shape)
 }
 
 
+/** Creates a single node of the scene graph.
+ */
 function world_obj( 
         xs, ys, zs, //Scale.
         xo, yo, zo, //Origin.
@@ -144,13 +147,18 @@ function world_obj(
         scl:            new Matrix4,
         rot:            new Matrix4, //Rotation about the "global" basis.
         local_rot:      new Matrix4, //Rotation about local basis.
-        origin:         new Matrix4,
+        origin:         new Matrix4, //The local origin
         world_matrix:   new Matrix4,
         local_matrix:   new Matrix4,
         shape:          verts,
         parent_:        null,
-        dirty:          true, // dirty "bit"
+        dirty:          true, // dirty bit
         children:       [],
+        /** Wraps the rotate methods of the Matrix4 class and forces them to
+         * update in the proper order so that each rotation is independant of
+         * the orientation of the basis resulting from the previous rotation.
+         * @param Each is a rotation about the corresponding axis.
+         */
         rotate:         function(x, y, z) {
             var pitch = new Matrix4;
             var roll  = new Matrix4;
@@ -175,16 +183,23 @@ function world_obj(
             }
             this.set_dirty();
         },
+        /** Translates the local translation matrix.
+         */
         translate:      function( x, y, z )
         {
             this.pos.translate( x, y, z );
             this.set_dirty();
         },
+        /// Scale.
         scale:          function( x, y, z )
         {
             this.scl.scale( x, y, z );
             this.set_dirty();
         },
+        /** Walks the tree in a depth-first search and updates a node and its
+         * subtree iff the dirty bit is set.
+         * @param dirty, The dirty bit being passed in from the parent.
+         */
         update_world:   function(dirty, p_world)
         {
             dirty |= this.dirty;
@@ -211,12 +226,13 @@ function world_obj(
                     this.world_matrix.set( this.local_matrix );
             }
 
-            // Recursively update all children in graph.
+            /// Recursively update all children in graph.
             for( var ii = 0; ii < this.children.length; ii++ )
                 this.children[ii].update_world( dirty, this.world_matrix );
 
             this.dirty = false;
         },
+        ///Sets the current node's parent to par.
         set_parent:     function(par)
         {
             par.children.push(this);
@@ -225,6 +241,13 @@ function world_obj(
 
             return true;
         },
+        /** Walks the tree in depth-first order and renders each object as
+         *necessary.
+         * @param gl, The monolithic WebGL object.
+         * @param view,  The view matrix to render to.
+         * @param proj,  The projection matrix.
+         * @param wf, Whether or not the shape should be drawn as a wireframe.
+         */
         render:         function( gl, view, proj, wf )
         {
             for( var ii = 0; ii < this.children.length; ii++ )
@@ -235,6 +258,10 @@ function world_obj(
                 this.shape.render( gl, this.world_matrix, view, proj, wf );
             }
         },
+        /** Gets a reference to a specific entry in the tree using the name of
+         * the desired object.
+         * @param id, The name or unique id of the object to be searched for.
+         */
         get_object:     function( id )
         {
             if( this.name == id )
@@ -250,6 +277,9 @@ function world_obj(
             }
             return obj;
         },
+        /** Sets the dirty bit of the gocal direction matrix and its entire
+         * subtree.
+         */
         set_dirty: function()
         {
             this.dirty = true;
@@ -270,6 +300,10 @@ function world_obj(
 }
 
 
+/** Wrapper needed for the initial version of the get_object() methode  This is
+ * no longer needed by the current vesrion of thia object but left here to make
+ * existing code to work as-is without needing to change code elsewhere.
+ */
 function search_graph( id, graph )
 {
     /*

@@ -5,6 +5,8 @@ const BASE_TILT = 10;
 
 /** Creates the camera object.
  * @param aspect, the initial aspect ratio.
+ * @param world_size, An array with two entries, x and y, that represent the
+ * maximum distance that can be travelled, +/-, away from the respective axis.
  */
 function get_camera(aspect, world_size)
 {
@@ -19,16 +21,19 @@ function get_camera(aspect, world_size)
         tilt:        BASE_TILT,
         size:        0.5,
         height:      1.5,
-        x: 0, z: 0,
-        x_max: world_size[0],
+        x: 0, z: 0, //Initial camera location.
+        x_max:     world_size[0],
         x_min: 0 - world_size[0],
-        z_max: world_size[1],
+        z_max:     world_size[1],
         z_min: 0 - world_size[1]
     };
     camera.translation.setTranslate(0, camera.height, 0);
     camera.rotation.setIdentity();
     camera.up_down.setRotate( 360 + BASE_TILT, 1, 0, 0 );
 
+    //  The DEBUG flag generates a camera location that is positioned below the
+    // plane.  This was useful during debugging, but requires face culling to
+    // be disabled in order for it to work properly.
     if( !DEBUG )
         camera.view_base.setLookAt( 
                 0, 0, 5,
@@ -56,7 +61,11 @@ function get_camera(aspect, world_size)
                 0, -2, 1,
                 0, 1, 0 );
 
-
+    /** Updates the projection matrix for the appropriate translations.  This
+     * is only necessary if the window, and therefore, the canvas's aspect
+     * ration has changed.
+     * @param ratio, in case the aspect ration needs to be updated.
+     */
     camera.update_projection = function(ratio)
     {
         this.proj.setPerspective(
@@ -76,6 +85,8 @@ function get_camera(aspect, world_size)
                     0, 1, 0 );
     };
 
+    /** Updates the view matrix.
+     */
     camera.update_view = function()
     {
         var temp = new Matrix4;
@@ -90,6 +101,7 @@ function get_camera(aspect, world_size)
             this.view.elements[i] = temp.elements[i];
     }
 
+    // The following methods all do exactly what they say they do.
     camera.rotate_left_by = function(degrees)
     {
         this.angle += degrees;
@@ -103,6 +115,8 @@ function get_camera(aspect, world_size)
 
     camera.rotate_right_by = function(degrees)
     {
+        // I had... odd... results using negative angles for rotations, but
+        //this is avoided by subtracting the angle fromm 360 degrees.
         this.angle += 360 - degrees;
         this.angle = this.angle % 360;
 
@@ -177,12 +191,16 @@ function get_camera(aspect, world_size)
         this.move_backward(distance);
     }
 
-
+    // Provides basic AABB collision detection for the camera with the outside
+    //boundariew of the world.
     camera.check_bounds = function(movement)
     {
         var difference = 0;
         if( this.x + this.size + movement[0] > this.x_max )
         {
+            // If the camera is "out-of-bounds," move it to the closest point
+            //within the bounds of the world.  Replicated for each edge of the
+            //world.
             difference = 
                 (this.x + this.size + movement[0]) - this.x_max;
             movement[0] -= difference;

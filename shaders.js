@@ -1,5 +1,11 @@
+/**
+ * Thomas R. Carrel
+ * @file object.js
+ */
 
-
+/** All functions in this file return an object containing both necessary
+ * shader programs.
+ */
 function get_terrain_shaders()
 {
     return {
@@ -57,34 +63,3 @@ function get_cube_shaders()
             '}\n'
     };
 }
-/*
-function get_sky_shaders()
-{
-    return {
-        vert:
-            'attribute  vec4    a_pos;\n' +
-            'attribute  vec4    a_color;\n' +
-            'uniform    mat4    u_xform;\n' +
-            'uniform    mat4    u_view;\n' +
-            'uniform    mat4    u_perspective;\n' +
-
-            'varying    vec4    v_coords;\n' +
-
-            'void main()\n' +
-            '{\n' +
-            '    gl_Position = u_perspective * u_view * u_xform * a_pos;\n' +
-            '    v_coords = a_pos;\n' +
-            '}\n',
-        frag:
-            'precision  mediump     float;\n' +
-
-            'uniform    samplerCube u_skybox;\n' +
-            'varying    vec4        v_coords;\n' +
-
-            'void main()\n' +
-            '{\n' +
-            '   gl_FragColor = textureCube(u_skybox, normalize(v_coords.xyz / <F4>);\n'+
-            '}\n'
-    };
-}
-*/
