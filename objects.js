@@ -29,7 +29,7 @@ function get_scene(shape)
     // Make the table.
     //   location is randomized...
     var table = world_obj(
-            1,   1, 1,
+            1,   1,   1,
             0,   1/2, 0, //Set origin to bottom of the feet of table.
             Math.random() * 50,   0, Math.random() * 50,
             0,   (Math.random() * 360), 0,
@@ -37,26 +37,26 @@ function get_scene(shape)
             "table" );
 
     var leg1 = world_obj(
-            1/8, 1,  1/8,
-            0,   0,  0,
-            31/64, 0,  31/64,
-            0,   270,  0,
+            1/8,   1,    1/8,
+            0,     0,    0,
+            31/64, 0,    31/64,
+            0,     270,  0,
             shape,
             "leg_1"
             );
     var leg2 = world_obj(
-            1/8, 1,  1/8,
-            0, 0,  0,
-            -31/64,  0,  31/64,
-            0,     180,  0,
+            1/8,    1,   1/8,
+            0,      0,   0,
+            -31/64, 0,   31/64,
+            0,      180, 0,
             shape,
             "leg_2"
             );
     var leg3 = world_obj(
-            1/8, 1,  1/8,
-            0, 0,  0,
-            -31/64,  0, -31/64,
-            0,     90,  0,
+            1/8,    1,  1/8,
+            0,      0,  0,
+            -31/64, 0, -31/64,
+            0,      90, 0,
             shape,
             "leg_3"
             );
@@ -103,6 +103,7 @@ function get_scene(shape)
             );
 
     var blades_ = [];
+    //Get the number of fan blades from the user.
     var b_qty = Math.floor(Number(window.prompt(
                 "Number of blades?\n" +
                 "  Less than 30 is recommended.\n"+
@@ -112,9 +113,9 @@ function get_scene(shape)
     for( var ii = 0; ii < 360; ii += (360 / b_qty) )
         blades_.push( world_obj(
                     1/16, 5/16, 1/64,
-                    0,   5/8,  0,
-                    0,   0,  0,
-                    7.5,   210,  ii,
+                    0,    5/8,  0,
+                    0,    0,    0,
+                    7.5,  210,  ii,
                     shape,
                     "blade_" + ii
                     ));    
@@ -303,6 +304,8 @@ function world_obj(
 /** Wrapper needed for the initial version of the get_object() methode  This is
  * no longer needed by the current vesrion of thia object but left here to make
  * existing code to work as-is without needing to change code elsewhere.
+ *
+ * I should remove this.
  */
 function search_graph( id, graph )
 {

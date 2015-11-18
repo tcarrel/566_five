@@ -1,6 +1,7 @@
 
 /** Builds and returns a single quad that can later be oriented and scaled as
  * necessary.
+ */
 function build_quad( width, length, w_offset, l_offset )
 {
     var quad = [];

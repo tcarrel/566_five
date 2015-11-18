@@ -136,12 +136,12 @@ function main()
     };
     // Image from: 
     //http://www.art.eonworks.com/free/textures/floor_tiles_texture_005.png
-    //t_texture.src = "./resources/floor_tiles.png";
+    t_texture.src = "./resources/floor_tiles.png";
 
     // Different textures for debugging.
     //t_texture.src = "./resources/debug.png";
     //t_texture.src = "./resources/debug_2.png";
-    t_texture.src = "./resources/cat.jpg";
+    //t_texture.src = "./resources/cat.jpg";
 
     gl.clearColor( 0.4, 0.4, 0.5, 1.0 );
 
